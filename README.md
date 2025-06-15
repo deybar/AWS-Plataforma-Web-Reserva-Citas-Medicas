@@ -14,7 +14,7 @@ La arquitectura se despliega dentro de una **VPC privada**, segmentada en **subr
 
 ### Diagrama de Arquitectura
 
-![Arquitectura en AWS](source/Arquitectura_AWS_proyecto final.png)
+![Arquitectura en AWS](Arquitectura_AWS_proyecto final.png)
 
 ## 👤 Autores
 
