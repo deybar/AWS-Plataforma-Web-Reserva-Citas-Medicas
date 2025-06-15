@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const reservationSummaryEl = document.getElementById("reservation-summary");
     const btnReservar = document.getElementById("btn-reservar");
     const btnConfirmarReserva = document.getElementById("btn-confirmar-reserva");
+    const patientNameDisplay = document.getElementById("patient-name-display"); // Nuevo: para mostrar el nombre del paciente
+    const logoutButton = document.getElementById("logout-button"); // Botón de cerrar sesión
 
     // Modales de Bootstrap
     const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
@@ -18,43 +20,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const confirmReservationModalBody = document.getElementById('confirmReservationModalBody');
 
     // Variables para almacenar la selección del usuario
-    let selectedDayElement = null; // Elemento DOM del día seleccionado en el calendario
-    let selectedDateString = null; // Fecha seleccionada en formato YYYY-MM-DD
-    let selectedTimeSlotElement = null; // Elemento DOM de la franja horaria seleccionada
-    let selectedTimeSlotString = null; // Franja horaria seleccionada (ej: "08:00-08:30")
+    let selectedDayElement = null;
+    let selectedDateString = null;
+    let selectedTimeSlotElement = null;
+    let selectedTimeSlotString = null;
     let selectedDoctorId = null;
     let selectedDoctorName = null;
 
-    // --- Datos de Doctores y Disponibilidad (Simulados) ---
-    // En un escenario real, esto vendría de una API
-    const doctors = [
-        {
-            id: 'doc1',
-            name: 'Dr. Ana García (General)',
-            busySlots: {
-                // Slots ocupados para el Dr. Ana García para cualquier día
-                // Puedes extender esto para tener disponibilidad por fecha si es necesario
-                morning: ["09:00-09:30", "11:00-11:30"],
-                afternoon: ["14:30-15:00", "16:30-17:00"]
-            }
-        },
-        {
-            id: 'doc2',
-            name: 'Dr. Carlos Pérez (Pediatra)',
-            busySlots: {
-                morning: ["08:30-09:00", "09:30-10:00"],
-                afternoon: ["13:00-13:30", "15:30-16:00"]
-            }
-        },
-        {
-            id: 'doc3',
-            name: 'Dr. Laura Martínez (Dermatóloga)',
-            busySlots: {
-                morning: ["10:00-10:30"],
-                afternoon: ["13:30-14:00", "16:00-16:30"]
-            }
-        }
-    ];
+    // URL base de tu backend
+    const BASE_API_URL = "http://44.199.251.29:5000/api";
 
     // Franjas horarias generales disponibles para todos los doctores
     const allMorningSlots = [
@@ -71,14 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- Funciones de utilidad ---
 
-    // Función para mostrar mensajes usando el modal general
     function showMessage(message, title = "Mensaje") {
         document.getElementById('messageModalLabel').textContent = title;
         messageModalBody.textContent = message;
         messageModal.show();
     }
 
-    // Función para actualizar el resumen de la reserva
     function updateReservationSummary() {
         if (selectedDateString && selectedTimeSlotString && selectedDoctorName) {
             reservationSummaryEl.innerHTML = `
@@ -87,26 +59,97 @@ document.addEventListener("DOMContentLoaded", function () {
                 Fecha: <span class="fw-bold text-primary">${selectedDateString}</span><br>
                 Hora: <span class="fw-bold text-primary">${selectedTimeSlotString}</span>
             `;
-            reservationSummaryEl.classList.remove("d-none"); // Mostrar el resumen
+            reservationSummaryEl.classList.remove("d-none");
         } else {
             reservationSummaryEl.innerHTML = "";
-            reservationSummaryEl.classList.add("d-none"); // Ocultar si no hay selección completa
+            reservationSummaryEl.classList.add("d-none");
         }
     }
 
-    // --- Funciones de inicialización y manejo de selección de Doctor ---
+    // --- Lógica de Carga de Datos del Backend ---
 
-    // Función para poblar el dropdown de doctores
-    function populateDoctorsDropdown() {
-        doctors.forEach(doctor => {
-            const option = document.createElement("option");
-            option.value = doctor.id;
-            option.textContent = doctor.name;
-            doctorSelect.appendChild(option);
-        });
+    async function fetchPatientName(idCognito) {
+        if (!idCognito) {
+            patientNameDisplay.textContent = "Usuario no logueado";
+            console.warn("ID de Cognito no encontrado en localStorage. Redirigiendo a login...");
+            // Redirigir al login si no hay ID de Cognito
+            window.location.href = "index.html"; // index.html es ahora tu página de login/registro
+            return;
+        }
+        try {
+            // Nota: Aquí usaremos el id_cognito, pero tu backend espera un ID numérico de persona.
+            // Necesitarías un endpoint en tu backend que resuelva el id_cognito a un id_persona.
+            // O bien, el backend podría devolver el nombre directamente al buscar por id_cognito.
+            // Para este ejemplo, simularé que tengo un id_paciente para enviar al endpoint existente.
+            // Si el backend espera 'id_cognito' para buscar el nombre, la URL sería:
+            // `${BASE_API_URL}/nombre_usuario_por_cognito/${idCognito}`
+            // Pero según el index_esteban.html, el endpoint es por id numérico.
+            // Por simplicidad en el frontend y dado que el backend de nombre_usuario espera un id numérico,
+            // usaremos el nombre guardado en localStorage como fallback o simularemos un ID.
+            // Idealmente, el backend debería tener un endpoint para obtener el nombre por id_cognito.
+
+            const userNameFromStorage = localStorage.getItem("userName"); // Nombre que guardamos del token Cognito
+            if (userNameFromStorage) {
+                patientNameDisplay.textContent = userNameFromStorage;
+            } else {
+                patientNameDisplay.textContent = "Usuario sin nombre";
+                // Podrías intentar buscar el nombre por el idCognito si tu backend lo soporta
+                // const response = await fetch(`${BASE_API_URL}/nombre_usuario_por_cognito/${idCognito}`);
+                // if (response.ok) {
+                //     const data = await response.json();
+                //     patientNameDisplay.textContent = data.nombre_completo;
+                //     localStorage.setItem("userName", data.nombre_completo); // Guardar para futuras cargas
+                // } else {
+                //     console.error("Error al obtener nombre de usuario por Cognito ID:", response.status);
+                //     patientNameDisplay.textContent = "Error al cargar nombre";
+                // }
+            }
+
+        } catch (error) {
+            console.error("Error al obtener el nombre del paciente:", error);
+            patientNameDisplay.textContent = "Error al cargar nombre";
+        }
     }
 
-    // Event listener para la selección de doctor
+    async function fetchDoctors() {
+        try {
+            const response = await fetch(`${BASE_API_URL}/medicos`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const doctorsData = await response.json();
+            populateDoctorsDropdown(doctorsData);
+        } catch (error) {
+            console.error("Error al cargar médicos:", error);
+            showMessage("No se pudo cargar la lista de doctores. Intenta de nuevo más tarde.", "Error de Carga");
+            // Deshabilitar el selector de doctores si hay un error
+            doctorSelect.innerHTML = `<option selected disabled value="">-- Error al cargar Doctores --</option>`;
+            doctorSelect.disabled = true;
+        }
+    }
+
+    // Función para poblar el dropdown de doctores
+    function populateDoctorsDropdown(doctorsArray) {
+        doctorSelect.innerHTML = '<option selected disabled value="">-- Selecciona un Doctor --</option>'; // Limpiar opciones existentes
+        if (doctorsArray.length > 0) {
+            doctorsArray.forEach(doctor => {
+                const option = document.createElement("option");
+                option.value = doctor.id_medico; // Asumo que tu API devuelve id_medico
+                option.textContent = `${doctor.nombre} ${doctor.apellido}`; // Asumo que devuelve nombre y apellido
+                doctorSelect.appendChild(option);
+            });
+            doctorSelect.disabled = false;
+        } else {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "No hay médicos disponibles";
+            doctorSelect.appendChild(option);
+            doctorSelect.disabled = true;
+        }
+    }
+
+    // --- Funciones de manejo de selección de Doctor y Calendario ---
+
     doctorSelect.addEventListener("change", function () {
         selectedDoctorId = this.value;
         selectedDoctorName = this.options[this.selectedIndex].textContent;
@@ -143,16 +186,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 dateClick: function (info) {
                     const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Normalizar hoy a inicio del día
+                    today.setHours(0, 0, 0, 0);
                     const selected = new Date(info.dateStr);
-                    selected.setHours(0, 0, 0, 0); // Normalizar selección a inicio del día
+                    selected.setHours(0, 0, 0, 0);
 
-                    // Restablecer el estilo del día previamente seleccionado
                     if (selectedDayElement) {
                         selectedDayElement.classList.remove("selected-day");
                     }
 
-                    // Si la fecha seleccionada es pasada, mostrar mensaje y no seleccionar
                     if (selected < today) {
                         showMessage("No puedes seleccionar una fecha pasada.");
                         selectedDayElement = null;
@@ -161,33 +202,30 @@ document.addEventListener("DOMContentLoaded", function () {
                         franjaDia.textContent = "selecciona un día";
                         morningSlots.innerHTML = "";
                         afternoonSlots.innerHTML = "";
-                        // Limpiar también la selección de franja horaria y el resumen
                         if (selectedTimeSlotElement) {
                             selectedTimeSlotElement.classList.remove("slot-seleccionado");
                             selectedTimeSlotElement = null;
                         }
                         selectedTimeSlotString = null;
-                        updateReservationSummary(); // Ocultar resumen si no hay fecha válida
+                        updateReservationSummary();
                         return;
                     }
 
-                    // Si la fecha es válida, aplicar la clase de seleccionado
-                    selectedDayElement = info.dayEl; // Guarda la referencia al elemento del día
+                    selectedDayElement = info.dayEl;
                     selectedDayElement.classList.add("selected-day");
 
-                    selectedDateString = info.dateStr; // Guarda la fecha seleccionada
+                    selectedDateString = info.dateStr;
                     selectedDateEl.textContent = `Has seleccionado: ${selectedDateString}`;
                     franjaDia.textContent = `el día ${selectedDateString}`;
 
-                    // Limpiar selección de franja horaria previa al cambiar de día
                     if (selectedTimeSlotElement) {
                         selectedTimeSlotElement.classList.remove("slot-seleccionado");
                         selectedTimeSlotElement = null;
                     }
                     selectedTimeSlotString = null;
 
-                    cargarFranjas(selectedDateString); // Cargar franjas para el día seleccionado
-                    updateReservationSummary(); // Actualizar el resumen
+                    cargarFranjas(selectedDateString, selectedDoctorId); // Pasa el ID del doctor
+                    updateReservationSummary();
                 },
                 dayCellDidMount: function (info) {
                     const fecha = new Date(info.date);
@@ -196,28 +234,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     fecha.setHours(0, 0, 0, 0);
 
                     if (fecha < hoy) {
-                        info.el.style.backgroundColor = "#eee"; // gris para días pasados
+                        info.el.style.backgroundColor = "#eee";
                         info.el.setAttribute("title", "Día pasado");
-                        // Eliminar cualquier estilo de "ocupado" o "disponible" si la fecha es pasada
                         info.el.classList.remove("slot-ocupado", "slot-disponible");
                     } else {
-                        // Aquí, la disponibilidad del día en el calendario (fondo de celda)
-                        // sigue siendo aleatoria, no vinculada al doctor específico.
-                        // Para vincularla, necesitarías una API que devuelva la disponibilidad
-                        // diaria de cada doctor. Por ahora, nos enfocamos en los slots.
-                        const ocupado = Math.random() > 0.6; // Simulación simple de ocupación del día
+                        // La disponibilidad del día sigue siendo simulada, no vinculada al doctor específico.
+                        // Para vincularla, el backend necesitaría dar disponibilidad diaria por doctor.
+                        const ocupado = Math.random() > 0.6;
                         info.el.style.backgroundColor = ocupado ? "#f8c6cc" : "#c5f7d3";
                         info.el.setAttribute("title", ocupado ? "Día lleno" : "Citas disponibles");
                         info.el.classList.add(ocupado ? "slot-ocupado-calendar-cell" : "slot-disponible-calendar-cell");
                     }
 
-                    // Estilo específico para el día de hoy
                     if (fecha.getFullYear() === hoy.getFullYear() &&
                         fecha.getMonth() === hoy.getMonth() &&
                         fecha.getDate() === hoy.getDate()) {
-                        info.el.style.backgroundColor = "rgba(194, 200, 211, 0.8)"; // azul claro para hoy
-                        info.el.style.color = "rgba(161, 22, 22, 0.8)"; // rojo
-                        info.el.style.fontWeight = "bold"; // negrita
+                        info.el.style.backgroundColor = "rgba(194, 200, 211, 0.8)";
+                        info.el.style.color = "rgba(161, 22, 22, 0.8)";
+                        info.el.style.fontWeight = "bold";
                         info.el.setAttribute("title", "Hoy");
                     }
 
@@ -226,32 +260,44 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             calendar.render();
         } else {
-            // Si el calendario ya está inicializado, solo necesitamos re-renderizarlo
-            // para que las tooltips y los estilos de día se actualicen si es necesario.
-            // Aunque para la disponibilidad de slots, eso se maneja en cargarFranjas.
-            calendar.refetchEvents(); // Si tuvieras eventos, los recargaría
-            calendar.render(); // Re-renderiza para aplicar posibles cambios de dayCellDidMount si los hubiere
+            // Si el calendario ya está inicializado y solo cambiamos de doctor,
+            // podemos re-renderizar los eventos si los tuviéramos (para la disponibilidad de días)
+            // y luego recargar las franjas horarias.
+            calendar.refetchEvents(); // Recarga si tienes eventos dinámicos por doctor
+            calendar.render();
         }
     });
 
     // Función para cargar y mostrar las franjas horarias según el doctor seleccionado
-    function cargarFranjas(fecha) {
-        if (!selectedDoctorId) {
-            morningSlots.innerHTML = "";
-            afternoonSlots.innerHTML = "";
-            return; // No cargar franjas si no hay doctor seleccionado
-        }
-
-        const doctor = doctors.find(d => d.id === selectedDoctorId);
-        if (!doctor) {
-            console.error("Doctor no encontrado para el ID:", selectedDoctorId);
+    async function cargarFranjas(fecha, doctorId) {
+        if (!doctorId) {
             morningSlots.innerHTML = "";
             afternoonSlots.innerHTML = "";
             return;
         }
 
-        const doctorBusyMorningSlots = doctor.busySlots.morning || [];
-        const doctorBusyAfternoonSlots = doctor.busySlots.afternoon || [];
+        // Simula la obtención de slots ocupados por doctor (antes era un array local)
+        // En un caso real, esto sería una llamada a tu API:
+        // const response = await fetch(`${BASE_API_URL}/doctor_disponibilidad/${doctorId}/${fecha}`);
+        // const data = await response.json();
+        // const busySlots = data.busySlots;
+
+        const simulatedDoctorBusySlots = { // Esto vendría de la API real del doctor
+            'doc1': {
+                morning: ["09:00-09:30", "11:00-11:30"],
+                afternoon: ["14:30-15:00", "16:30-17:00"]
+            },
+            'doc2': {
+                morning: ["08:30-09:00", "09:30-10:00"],
+                afternoon: ["13:00-13:30", "15:30-16:00"]
+            },
+            'doc3': {
+                morning: ["10:00-10:30"],
+                afternoon: ["13:30-14:00", "16:00-16:30"]
+            }
+        };
+
+        const currentDoctorBusySlots = simulatedDoctorBusySlots[doctorId] || { morning: [], afternoon: [] };
 
         morningSlots.innerHTML = "";
         afternoonSlots.innerHTML = "";
@@ -263,28 +309,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!isOccupied) {
                 div.addEventListener("click", () => {
-                    // Quitar la clase de selección del slot previamente seleccionado
                     if (selectedTimeSlotElement) {
                         selectedTimeSlotElement.classList.remove("slot-seleccionado");
                     }
-                    // Asignar y aplicar la clase al nuevo slot seleccionado
                     selectedTimeSlotElement = div;
                     selectedTimeSlotElement.classList.add("slot-seleccionado");
-                    selectedTimeSlotString = slot; // Guardar la franja horaria
+                    selectedTimeSlotString = slot;
 
-                    updateReservationSummary(); // Actualizar el resumen
+                    updateReservationSummary();
                 });
             }
             return div;
         };
 
         allMorningSlots.forEach((slot) => {
-            const ocupado = doctorBusyMorningSlots.includes(slot); // La ocupación depende del doctor
+            const ocupado = currentDoctorBusySlots.morning.includes(slot);
             morningSlots.appendChild(createSlotDiv(slot, ocupado));
         });
 
         allAfternoonSlots.forEach((slot) => {
-            const ocupado = doctorBusyAfternoonSlots.includes(slot); // La ocupación depende del doctor
+            const ocupado = currentDoctorBusySlots.afternoon.includes(slot);
             afternoonSlots.appendChild(createSlotDiv(slot, ocupado));
         });
     }
@@ -300,10 +344,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Mostrar el modal de confirmación con el resumen
         confirmReservationModalBody.innerHTML = `
-            ¿Estás seguro de que quieres reservar tu cita con el Doctor
-            <span class="fw-bold text-primary">${selectedDoctorName}</span> para el día
+            ¿Estás seguro de que quieres reservar tu cita con el Dr.
+            <span class="fw-bold text-primary">${selectedDoctorName}</span> para el
             <span class="fw-bold text-primary">${selectedDateString}</span>
             a las <span class="fw-bold text-primary">${selectedTimeSlotString}</span>?
         `;
@@ -312,17 +355,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Event listener para el botón "Confirmar" dentro del modal de confirmación
     btnConfirmarReserva.addEventListener("click", () => {
-        // Aquí iría la lógica real para guardar la cita en una base de datos o API
         console.log(`Cita confirmada para ${selectedDateString} a las ${selectedTimeSlotString} con el Dr. ${selectedDoctorName}`);
 
-        // Ocultar el modal de confirmación
         confirmReservationModal.hide();
 
-        // Mostrar un mensaje de éxito usando el modal general
         showMessage(`¡Cita reservada correctamente con el Dr. ${selectedDoctorName} para el ${selectedDateString} a las ${selectedTimeSlotString}!`);
 
         // Opcional: Resetear la interfaz después de la reserva exitosa
-        // calendar.render(); // Para refrescar el calendario si es necesario
+        // Para reiniciar la selección y ocultar el calendario, descomenta esto:
         // selectedDateEl.textContent = "Selecciona un día en el calendario";
         // franjaDia.textContent = "selecciona un día";
         // morningSlots.innerHTML = "";
@@ -344,7 +384,20 @@ document.addEventListener("DOMContentLoaded", function () {
         // updateReservationSummary();
     });
 
+    // --- Lógica para cerrar sesión ---
+    logoutButton.addEventListener("click", function() {
+        // Limpiar datos de sesión (ej. de localStorage)
+        localStorage.removeItem("emailConfirmado");
+        localStorage.removeItem("idCognito");
+        localStorage.removeItem("userName");
+        // Redirigir a la página de login
+        window.location.href = "index.html";
+    });
+
     // --- Inicialización al cargar la página ---
-    populateDoctorsDropdown(); // Cargar los doctores en el dropdown
+    const idCognitoPaciente = localStorage.getItem("idCognito");
+    fetchPatientName(idCognitoPaciente); // Cargar el nombre del paciente en el navbar
+    fetchDoctors(); // Cargar los doctores en el dropdown
+
     // El calendario y las franjas horarias están ocultos por defecto hasta que se seleccione un doctor.
 });

@@ -1,5 +1,5 @@
 import pymysql
-from bd import get_connection
+from backend.bd import get_connection
 
 def guardar_paciente(datos):
     try:
