@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reserva Cita Médica</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Tu hoja de estilos personalizada -->
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-light">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4">
+        <a class="navbar-brand" href="index.html">Home</a> <!-- Apunta al login/registro -->
+        <div class="navbar-nav">
+            <a class="nav-link active" href="reservar_citas.html">Reservar cita</a> <!-- Enlace a sí misma -->
+            <a class="nav-link" href="consultar_citas.html">Consultar citas</a>
+        </div>
+        <div class="ms-auto text-white d-flex align-items-center gap-3">
+            <span><strong>Deybar Andres Mora Segura</strong></span>
+            <button class="btn btn-outline-light btn-sm">Cerrar sesión</button>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <div class="container py-4">
+        <h3 class="mb-4 text-center">Selecciona un Doctor</h3>
+
+        <!-- Selector de Doctores -->
+        <div class="mb-4 doctor-select-wrapper">
+            <label for="doctor-select" class="form-label visually-hidden">Selecciona un doctor:</label>
+            <select class="form-select form-select-lg" id="doctor-select" aria-label="Selecciona un doctor">
+                <option selected disabled value="">-- Selecciona un Doctor --</option>
+                <!-- Opciones de doctores se cargarán con JS -->
+            </select>
+        </div>
+
+        <!-- Contenido del Calendario y Franjas Horarias (inicialmente oculto) -->
+        <div id="calendar-and-slots-container" class="d-none">
+            <h5 id="selected-date" class="mb-3 text-muted">Selecciona un día en el calendario</h5>
+
+            <!-- Calendario -->
+            <div class="calendario-wrapper mb-4">
+                <div id="calendar"></div>
+            </div>
+
+            <!-- Franjas Horarias -->
+            <h5 class="mb-3 text-muted">Citas disponibles para <span id="franja-dia">selecciona un día</span></h5>
+
+            <div class="row g-2 mb-3">
+                <div class="col-12 col-md-6">
+                    <h6>Mañana</h6>
+                    <div id="morning-slots" class="d-flex flex-wrap gap-2"></div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <h6>Tarde</h6>
+                    <div id="afternoon-slots" class="d-flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Resumen de la cita seleccionada -->
+            <div id="reservation-summary" class="alert alert-info mt-4 mb-3 d-none" role="alert">
+                <!-- El contenido se generará con JavaScript -->
+            </div>
+
+            <button class="btn btn-outline-primary" id="btn-reservar">Reservar cita</button>
+        </div> <!-- /#calendar-and-slots-container -->
+    </div>
+
+    <!-- Modal para mensajes generales (reemplaza alert()) -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">Mensaje</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody">
+                    <!-- Contenido del mensaje aquí -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Confirmación de Reserva -->
+    <div class="modal fade" id="confirmReservationModal" tabindex="-1" aria-labelledby="confirmReservationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmReservationModalLabel">Confirmar Reserva de Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="confirmReservationModalBody">
+                    <!-- Resumen de la cita para confirmar -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-confirmar-reserva">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FullCalendar JS (global bundle for convenience) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Tu JS personalizado -->
+    <script src="app.js"></script>
+
+</body>
+</html>

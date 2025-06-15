@@ -1,0 +1,32 @@
+/* Estilos para la página de consultar_citas.html */
+
+/* Estilo para las tarjetas de citas */
+.appointment-card {
+    border: 1px solid #ddd;
+    border-radius: 10px; /* Consistencia con los bordes redondeados */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px); /* Pequeño efecto al pasar el ratón */
+}
+
+.appointment-card .card-header {
+    background-color: #007bff; /* Color primario */
+    color: white;
+    font-weight: bold;
+    border-top-left-radius: 10px; /* Redondea las esquinas superiores */
+    border-top-right-radius: 10px;
+}
+
+.appointment-card .card-body p {
+    margin-bottom: 0.5rem;
+}
+
+/* Para los botones de acción dentro de la tarjeta */
+.appointment-card .btn {
+    border-radius: 5px; /* Ligeramente menos redondeado que el card */
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+}

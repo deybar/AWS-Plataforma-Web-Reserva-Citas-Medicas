@@ -1,0 +1,99 @@
+/* Colores personalizados */
+.slot-ocupado {
+    background-color: #f8c6cc;
+    color: #a94442;
+    border-radius: 10px; /* Ya redondeado */
+    padding: 5px 12px;
+    border: none;
+}
+
+.slot-disponible {
+    background-color: #c5f7d3;
+    color: #2e7d32;
+    border-radius: 10px; /* Ya redondeado */
+    padding: 5px 12px;
+    border: none;
+    cursor: pointer;
+}
+
+.slot-disponible:hover {
+    background-color: #a5e6ba;
+    transform: scale(1.05);
+    transition: 0.2s;
+}
+
+/* Estilo para la franja horaria seleccionada */
+.slot-seleccionado {
+    background-color: #007bff !important; /* Azul primario de Bootstrap */
+    color: white !important;
+    border: 1px solid #0056b3; /* Borde más oscuro */
+    transform: scale(1.05);
+    transition: 0.2s;
+    border-radius: 10px; /* Asegura que el seleccionado también sea redondeado */
+}
+
+#btn-reservar {
+    font-weight: bold;
+}
+
+/* Ajusta ancho del calendario según pantalla */
+.calendario-wrapper {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .calendario-wrapper {
+        width: 45%;
+        margin: 0 auto;
+    }
+}
+
+/* Estilos adicionales para FullCalendar */
+
+/* Quitar subrayado de los días de la semana y los números de los días */
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+    text-decoration: none !important;
+}
+
+/* Poner los números de los días en negrita */
+.fc-daygrid-day-number {
+    font-weight: bold !important;
+}
+
+/* Resaltado al pasar el ratón (hover) */
+/* Aplica solo a días futuros o el día actual, excluyendo los pasados */
+.fc-daygrid-day:not(.fc-day-past):hover {
+    background-color: rgba(173, 216, 230, 0.5) !important; /* Azul claro semitransparente */
+    cursor: pointer;
+}
+
+/* Estilo para el día seleccionado */
+.selected-day {
+    border: 2px solid #007bff !important; /* Borde azul para demarcar */
+    background-color: rgba(0, 123, 255, 0.2) !important; /* Fondo azul más claro */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra para mayor énfasis */
+    border-radius: 10px !important; /* Hazlo redondeado también */
+}
+
+/* NUEVO: Aplicar border-radius a las celdas del día del calendario */
+/* Esto afectará a todas las celdas de los días (pasadas, presentes, futuras) */
+.fc-daygrid-day-frame {
+    border-radius: 5px; /* Mismo radio que tus slots */
+    overflow: hidden; /* Asegura que el contenido no sobresalga del borde redondeado */
+    /* Ajustes para reducir la altura de las celdas del calendario */
+    min-height: 50px; /* Puedes ajustar este valor, por ejemplo a 60px o 50px */
+    height: 50px; /* Permite que la altura se ajuste automáticamente */
+    padding-top: 5px !important; /* Reduce el padding superior */
+    padding-bottom: 5px !important; /* Reduce el padding inferior */
+}
+
+/* También aplica a la celda del día en general, para asegurar que los fondos se adapten */
+.fc-daygrid-day {
+    border-radius: 5px; /* Mismo radio que tus slots */
+}
+
+/* Y si el tooltip está afectando, puedes ajustarlo */
+.tooltip-inner {
+    border-radius: 5px; /* Ajusta el radio de los tooltips si es necesario */
+}

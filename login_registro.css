@@ -1,0 +1,98 @@
+/* login_registro.css */
+
+body {
+    background-color: #f8f9fa; /* bg-light de Bootstrap */
+    font-family: 'Inter', sans-serif; /* Consistente con el resto del proyecto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Asegura que el cuerpo ocupe al menos toda la altura de la ventana */
+    margin: 0;
+}
+
+.login-container {
+    background-color: #ffffff; /* Fondo blanco para el contenedor del formulario */
+    padding: 2.5rem;
+    border-radius: 10px; /* Bordes redondeados consistentes */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave para un efecto flotante */
+    width: 100%;
+    max-width: 480px; /* Ancho máximo para el formulario */
+    /* text-align: center; No necesario si usamos d-grid para botones y centrado de texto individual */
+}
+
+.login-container h2, .login-container h4 {
+    color: #343a40; /* Color oscuro para títulos */
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.form-control {
+    border-radius: 8px; /* Bordes redondeados para los inputs */
+    padding: 0.8rem 1rem;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #80bdff; /* Color de enfoque de Bootstrap primary */
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Sombra de enfoque Bootstrap primary */
+}
+
+/* Estilos para botones primarios (usando los colores del navbar) */
+.btn-primary {
+    background-color: #007bff; /* Color primario de Bootstrap */
+    border-color: #007bff;
+    border-radius: 8px; /* Bordes redondeados para el botón */
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Tono más oscuro al pasar el ratón */
+    border-color: #0056b3;
+}
+
+/* Estilos para botones secundarios (si los hubiera) */
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Enlaces pequeños (ej: ¿Olvidaste tu contraseña?, Regístrate aquí) */
+.small-link {
+    font-size: 0.9rem;
+    color: #007bff; /* Color primario */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.small-link:hover {
+    text-decoration: underline;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1.5rem;
+        margin: 1rem; /* Margen para pantallas más pequeñas */
+    }
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    .login-container h2, .login-container h4 {
+        font-size: 1.75rem;
+    }
+}
